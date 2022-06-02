@@ -1,29 +1,57 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   StyleSheet,
   Text,
   TextInput,
   View,
-  TouchableOpacity,
+  Platform,
+  FlatList,
 } from "react-native";
+import { Button } from "../components/Button";
+import { SkillCard } from "../components/SkillCard";
 
-export const Home = () => (
-  <View style={styles.container}>
-    <Text style={styles.title}>Welcome, Alecsander</Text>
+export const Home = () => {
+  const [newSkill, setNewSkill] = useState("");
+  const [mySkills, setMySkills] = useState([]);
+  const [greeting, setGreeting] = useState("");
 
-    <TextInput
-      style={styles.input}
-      placeholder="New skill"
-      placeholderTextColor="#555"
-    />
+  const handleAddNewSkill = () =>
+    setMySkills((oldState) => [...oldState, newSkill]);
 
-    <TouchableOpacity activeOpacity={0.7} style={styles.button}>
-      <Text style={styles.buttonText}>Add</Text>
-    </TouchableOpacity>
+  useEffect(() => {
+    const currentHour = new Date().getHours();
 
-    <Text style={[styles.title, { marginTop: 50 }]}>My Skills</Text>
-  </View>
-);
+    if (currentHour < 12) {
+      setGreeting("Good morning");
+    } else if (currentHour >= 12 && currentHour < 18) {
+      setGreeting("Good afternoon");
+    } else {
+      setGreeting("Good night");
+    }
+  }, []);
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>Welcome, Alecsander</Text>
+      <Text style={styles.greetings}>{greeting}</Text>
+
+      <TextInput
+        style={styles.input}
+        placeholder="New skill"
+        placeholderTextColor="#555"
+        onChangeText={setNewSkill}
+      />
+
+      <Button onPress={handleAddNewSkill} />
+
+      <FlatList
+        data={mySkills}
+        keyExtractor={(item) => item}
+        renderItem={({ item: skill }) => <SkillCard {...{ skill }} />}
+      />
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -46,16 +74,7 @@ const styles = StyleSheet.create({
     marginTop: 30,
     borderRadius: 7,
   },
-  button: {
-    backgroundColor: "#A370F7",
-    padding: 15,
-    borderRadius: 7,
-    alignItems: "center",
-    marginTop: 20,
-  },
-  buttonText: {
+  greetings: {
     color: "#FFF",
-    fontSize: 17,
-    fontWeight: "bold",
   },
 });
